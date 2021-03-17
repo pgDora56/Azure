@@ -1,0 +1,57 @@
+<html lang="ja">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Google Fonts -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <!-- CSS Reset -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+        <!-- Milligram CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+        <!-- Original CSS -->
+        <link rel="stylesheet" href="/resource/css/common.css">
+        <title>IntroQuiz Portal Square "Azure"</title>
+    </head>
+    <body>
+        <header>
+            <h1>IntroQuiz Portal Square "Azure"</h1>
+        </header>
+        <section id="main">
+            <article class="card">
+                <h3>試験運用中</h3>
+                <p>現在試験運用中です。直近3ヶ月までの予定が記載されます。</p>
+                <p>現在登録されている団体は以下の通りです。</p>
+                <ul>
+                    {{range .circles}}
+                    <li>{{.}}</li>
+                    {{end}}
+                </ul>
+            </article>
+            <p class="sub">Last Update: {{.update}}</p>
+            <article class="card">
+                <table>
+                    {{$i := ""}}
+                    {{range .sche}}
+                    {{if ne .Schedule.Start.Date ""}}
+                    <tr>
+                        <th colspan="3">
+                            {{.Schedule.Start.Date}}
+                        </th>
+                    </tr>
+                    {{end}}
+                    <tr>
+                        {{if ne .Schedule.Start.Time ""}}
+                        <td>{{.Schedule.Start.Time}} ~ {{.Schedule.End.Time}}</td>
+                        {{else}}
+                        <td></td>
+                        {{end}}
+                        <td class="fit">{{.Simple}}</td>
+                        <td>{{.Schedule.Title}}</td>
+                    </tr>
+                    {{end}}
+                </table>
+            </article>
+        </section>
+    </body>
+</html>
+

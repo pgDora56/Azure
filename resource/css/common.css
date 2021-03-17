@@ -1,0 +1,44 @@
+body {
+    margin: 20px 30px;
+}
+
+section{
+    padding-top: 40px
+}
+
+a {
+    color: darkorange;
+}
+
+a:hover {
+    color: skyblue;
+}
+
+.card {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px #ccc;
+    margin: 1.0rem 0;
+    padding: 2.0rem;
+}
+
+.sub {
+    text-align: right;
+    color: gray;
+}
+
+td.fit {
+    white-space: nowrap;
+    width: 0;
+}
+
+.gray-bg {
+    background-color: gray;
+}
+
+
+#main {
+    margin: 0 auto;
+    max-width: 700px;
+}
+

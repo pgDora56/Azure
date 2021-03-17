@@ -17,13 +17,37 @@ import (
 )
 
 type Server struct {
-	Name        string
-	CalendarURL string
+	SimpleName  string `json:"simple"`
+	Name        string `json:"name"`
+	Overview    string `json:"overview"`
+	Twitter     string `json:"twitter"`
+	Contact     string `json:"contact"`
+	CalendarURL string `json:"url"`
 }
 
 type IntroEvent struct {
-	Place string
-	Event *calendar.Event
+	CircleId string
+	Event    *calendar.Event
+}
+
+type IntroSchedule struct {
+	No          int      `json:"no"`
+	CircleId    string   `json:"circle"`
+	EventId     string   `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Start       DateData `json:"start"`
+	End         DateData `json:"end"`
+}
+
+type DateData struct {
+	Date string `json:"date"`
+	Time string `json:"time"`
+}
+
+type ScheduleConfig struct {
+	Update    string                   `json:"update"`
+	Schedules map[string]IntroSchedule `json:"schedules"`
 }
 
 // Retrieve a token, saves the token, then returns the generated client.
@@ -81,7 +105,18 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func GetEvents() {
+func getServerFromJSON() (servers map[string]Server) {
+	bytes, err := ioutil.ReadFile("circles.json")
+	if err != nil {
+		log.Fatalf("Can't read `servers.json`. %v\n", err)
+	}
+	if err = json.Unmarshal(bytes, &servers); err != nil {
+		log.Fatalf("Can't parse `servers.json`. %v\n", err)
+	}
+	return
+}
+
+func GetEvents() []IntroEvent {
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
@@ -99,27 +134,25 @@ func GetEvents() {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
 
-	t := time.Now().Format(time.RFC3339)
+	now := time.Now()
+	t := now.Format(time.RFC3339)
+	month3 := now.Add(time.Duration(90*24) * time.Hour)
+	m3 := month3.Format(time.RFC3339)
 
-	servers := []Server{
-		Server{"IKM", "8skmlerhojthfhm8c8h76deqds@group.calendar.google.com"}, // IKM
-		// "l9k5hhna9anjlrjmrum3v4m4hg@group.calendar.google.com", // Flash
-		Server{"AIQ", "10fmjofa984qpol7oubsfs6eq8@group.calendar.google.com"},      // AIQ
-		Server{"Tamayura", "mcr5e8d0dbe09s5u7orrqlg0co@group.calendar.google.com"}, // Tamayura
-	}
+	servers := getServerFromJSON()
 
 	var introEvents []IntroEvent
 	// var evelist [](*calendar.Event)
-	for _, server := range servers {
+	for key, server := range servers {
 		url := server.CalendarURL
 		events, err := srv.Events.List(url).ShowDeleted(false).
-			SingleEvents(true).TimeMin(t).MaxResults(20).OrderBy("startTime").Do()
+			SingleEvents(true).TimeMin(t).TimeMax(m3).OrderBy("startTime").Do()
 		if err != nil {
-			log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
+			log.Fatalf("Unable to retrieve next ten of the user's events: %v\n", err)
 		}
 		for _, item := range events.Items {
 			// evelist = append(evelist, item)
-			introEvents = append(introEvents, IntroEvent{server.Name, item})
+			introEvents = append(introEvents, IntroEvent{key, item})
 			// date := item.Start.DateTime
 			// if date == "" {
 			// 	date = item.Start.Date
@@ -129,14 +162,78 @@ func GetEvents() {
 	}
 
 	sort.Slice(introEvents, func(i, j int) bool { return compareEvent(introEvents[i].Event.Start, introEvents[j].Event.Start) })
-	for _, ieve := range introEvents {
-		eve := ieve.Event
-		date := eve.Start.DateTime
-		if date == "" {
-			date = eve.Start.Date
-		}
-		fmt.Printf("%v - [%v]%v\n", date, ieve.Place, eve.Summary)
+	return introEvents
+	// for _, ieve := range introEvents {
+	// 	eve := ieve.Event
+	// 	date := eve.Start.DateTime
+	// 	if date == "" {
+	// 		date = eve.Start.Date
+	// 	}
+	// 	fmt.Printf("%v - [%v]%v\n", date, ieve.Place, eve.Summary)
+	// }
+}
+
+func GetScheduleJson() ScheduleConfig {
+	js, err := ioutil.ReadFile("schedule.json")
+	if err != nil {
+		log.Fatalf("Can't read schedule.json: %v\n", err)
 	}
+	var cfg ScheduleConfig
+	if err := json.Unmarshal(js, &cfg); err != nil {
+		log.Fatalf("Unmarshal error when parse schedule.json: %v\n", err)
+	}
+	return cfg
+}
+
+func MakeScheduleJson() {
+	introEvents := GetEvents()
+	schedules := map[string]IntroSchedule{}
+	var prev string
+	for idx, eve := range introEvents {
+		var stime, sdate, etime, edate string
+		if eve.Event.Start.Date == "" {
+			start, err := time.Parse(time.RFC3339, eve.Event.Start.DateTime)
+			if err != nil {
+				log.Fatalf("Start time can't parse!: %v\n", err)
+			}
+			sdate = start.Format("2006/01/02(Mon)")
+			stime = start.Format("15:04")
+		} else {
+			tmpsdate, err := time.Parse("2006-01-02", eve.Event.Start.Date)
+			if err != nil {
+				log.Fatalf("Start date can't parse!: %v\n", err)
+			}
+			sdate = tmpsdate.Format("2006/01/02(Mon)")
+		}
+
+		if eve.Event.End.Date == "" {
+			end, err := time.Parse(time.RFC3339, eve.Event.End.DateTime)
+			if err != nil {
+				log.Fatalf("End time can't parse!: %v\n", err)
+			}
+			etime = end.Format("15:04")
+		}
+		if prev == sdate {
+			sdate = ""
+		} else {
+			prev = sdate
+		}
+		schedules[eve.Event.Id] = IntroSchedule{
+			No:          idx + 1,
+			CircleId:    eve.CircleId,
+			EventId:     eve.Event.Id,
+			Title:       eve.Event.Summary,
+			Description: eve.Event.Description,
+			Start:       DateData{Date: sdate, Time: stime},
+			End:         DateData{Date: edate, Time: etime},
+		}
+	}
+
+	js, err := json.MarshalIndent(ScheduleConfig{Update: time.Now().Format("2006-01-02 15:04:05"), Schedules: schedules}, "", "    ")
+	if err != nil {
+		log.Fatalf("Json marshal error: %v\n", err)
+	}
+	ioutil.WriteFile("schedule.json", js, 0644)
 }
 
 func compareEvent(dt1, dt2 *calendar.EventDateTime) bool {

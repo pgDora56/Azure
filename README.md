@@ -24,12 +24,13 @@ Private repository
 ### circles.json
 
 ```json
-{
+"aiq": {
     "simple": "AIQ", 
     "name": "AIQオンライン",
     "overview": "サークル概要",
     "twitter": "aiq_list",
-    "contact": "xxx@example.com"
+    "contact": "xxx@example.com",
+    "url": "xxxxxxxxxxxxxxxx@group.calendar.google.com"
 }
 ```
 
