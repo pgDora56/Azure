@@ -31,13 +31,14 @@ func main() {
 	router := gin.Default()
 
 	// js,css,faviconなどを読み込むためのasstes設定
-	router.LoadHTMLGlob("view/*.html")
+	router.LoadHTMLGlob("view/*.tmpl")
 	router.Static("/resource", "./resource")
 	router.StaticFile("/favicon.ico", "./resource/favicon.ico")
 
 	router.GET("/", func(ctx *gin.Context) {
 		cfg := cal.GetScheduleJson()
-		ctx.HTML(http.StatusOK, "main.html", gin.H{
+		ctx.HTML(http.StatusOK, "main.tmpl", gin.H{
+			"title":   "Top",
 			"update":  cfg.Update,
 			"sche":    getTemplateSche(cfg.Schedules),
 			"circles": getCircles(),
@@ -45,7 +46,9 @@ func main() {
 	})
 
 	router.GET("/about", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "about.html", gin.H{})
+		ctx.HTML(http.StatusOK, "about.tmpl", gin.H{
+			"title": "About",
+		})
 	})
 
 	router.Run(":52417")
