@@ -40,11 +40,15 @@ func main() {
 		ctx.HTML(http.StatusOK, "main.html", gin.H{
 			"update":  cfg.Update,
 			"sche":    getTemplateSche(cfg.Schedules),
-			"circles": getCircleList(),
+			"circles": getCircles(),
 		})
 	})
 
-	router.Run(":56417")
+	router.GET("/about", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "about.html", gin.H{})
+	})
+
+	router.Run(":52417")
 
 	log.Println("End Introquiz Portal Square Azure")
 }
@@ -58,28 +62,19 @@ func loopGet() {
 	}
 }
 
-type Circle struct {
-	Simple   string
-	Name     string
-	Overview string
-	Twitter  string
-	Contact  string
-	Url      string
-}
-
 type TmpSchedule struct {
-	Schedule cal.IntroSchedule
-	EventId  string
-	Simple   string
+	Schedule   cal.IntroSchedule
+	Simple     string
+	CircleName string
 }
 
-func getCircles() map[string]Circle {
+func getCircles() map[string]cal.Circle {
 	js, err := ioutil.ReadFile("circles.json")
 	if err != nil {
 		log.Fatalf("Can't read circles.json: %v\n", err)
 	}
 
-	var circles map[string]Circle
+	var circles map[string]cal.Circle
 	err = json.Unmarshal(js, &circles)
 	if err != nil {
 		log.Fatalf("Unmarshal error circles.json: %v\n", err)
@@ -89,21 +84,21 @@ func getCircles() map[string]Circle {
 
 func getTemplateSche(sche map[string]cal.IntroSchedule) (sc []TmpSchedule) {
 	cir := getCircles()
-	for key, s := range sche {
+	for _, s := range sche {
 		sc = append(sc, TmpSchedule{
-			Schedule: s,
-			EventId:  key,
-			Simple:   cir[s.CircleId].Simple,
+			Schedule:   s,
+			Simple:     cir[s.CircleId].SimpleName,
+			CircleName: cir[s.CircleId].Name,
 		})
 	}
 	sort.Slice(sc, func(i, j int) bool { return sc[i].Schedule.No < sc[j].Schedule.No })
 	return sc
 }
 
-func getCircleList() (clist []string) {
-	circles := getCircles()
-	for _, c := range circles {
-		clist = append(clist, c.Name)
-	}
-	return
-}
+// func getCircleList() (clist []string) {
+// 	circles := getCircles()
+// 	for _, c := range circles {
+// 		clist = append(clist, c.Name)
+// 	}
+// 	return
+// }

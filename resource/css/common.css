@@ -1,17 +1,32 @@
-body {
+#page {
     margin: 20px 30px;
 }
 
 section{
-    padding-top: 40px
+    padding-top: 41.7px;
 }
 
 a {
-    color: darkorange;
+    color: darkblue;
 }
 
 a:hover {
     color: skyblue;
+}
+
+header a{
+    color: black
+}
+
+button {
+    background-color: darkblue !important;
+    border: 0.1rem solid darkblue !important;
+    color: white !important;
+}
+
+#main {
+    margin: 0 auto;
+    max-width: 941.7px;
 }
 
 .card {
@@ -27,7 +42,16 @@ a:hover {
     color: gray;
 }
 
-td.fit {
+.azure-enhance {
+    color: darkblue;
+    font-weight: bold;
+}
+
+h4.circle-title {
+    text-align: center;
+}
+
+th.fit, td.fit {
     white-space: nowrap;
     width: 0;
 }
@@ -36,9 +60,58 @@ td.fit {
     background-color: gray;
 }
 
-
-#main {
-    margin: 0 auto;
-    max-width: 700px;
+table.event-detail tr,
+table.event-detail td {
+    width: 100%;
 }
 
+.wrap-button {
+    text-align: center;
+}
+
+footer {
+    text-align:center;
+    margin: 20px auto;
+}
+
+/* Modal CSS */
+.modal{
+    display: none;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+.modal__bg{
+    background: rgba(0,0,0,0.8);
+    height: 100vh;
+    position: absolute;
+    width: 100vw;
+}
+.modal__content{
+    background: #fff;
+    left: 50%;
+    padding: 34.17px;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 60%;
+}
+
+
+/* For tablet or smartphone */
+@media screen and (max-width: 767px) {
+    #page {
+        margin: 2rem 1rem;
+    }
+
+    h1 {
+        font-size: 3.417rem;
+        text-align: center;
+    }
+
+    .modal__content {
+        padding: 20px;
+        width: 100%;
+    }
+}

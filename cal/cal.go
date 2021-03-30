@@ -16,13 +16,18 @@ import (
 	"google.golang.org/api/calendar/v3"
 )
 
-type Server struct {
-	SimpleName  string `json:"simple"`
-	Name        string `json:"name"`
-	Overview    string `json:"overview"`
-	Twitter     string `json:"twitter"`
-	Contact     string `json:"contact"`
-	CalendarURL string `json:"url"`
+type Circle struct {
+	SimpleName  string         `json:"simple"`
+	Name        string         `json:"name"`
+	Overview    []string       `json:"overview"`
+	Detail      []CircleDetail `json:"detail"`
+	CalendarURL string         `json:"url"`
+}
+
+type CircleDetail struct {
+	Item  string `json:"item"`
+	Link  string `json:"link"`
+	Value string `json:"value"`
 }
 
 type IntroEvent struct {
@@ -105,7 +110,7 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func getServerFromJSON() (servers map[string]Server) {
+func getCircleFromJSON() (servers map[string]Circle) {
 	bytes, err := ioutil.ReadFile("circles.json")
 	if err != nil {
 		log.Fatalf("Can't read `servers.json`. %v\n", err)
@@ -139,7 +144,7 @@ func GetEvents() []IntroEvent {
 	month3 := now.Add(time.Duration(90*24) * time.Hour)
 	m3 := month3.Format(time.RFC3339)
 
-	servers := getServerFromJSON()
+	servers := getCircleFromJSON()
 
 	var introEvents []IntroEvent
 	// var evelist [](*calendar.Event)
