@@ -7,10 +7,11 @@
                 <article class="card">
                     <h3>試験運用中</h3>
                     <p>現在試験運用中です。直近3ヶ月までの予定が記載されます。</p>
+                    <p>当サイトの利用によって生じた不利益について、サイト側は一切の責任を負いません。自己責任でご利用ください。</p>
                     <p>現在登録されている団体は以下の通りです。</p>
                     <ul>
                         {{range $k, $c := .circles}}
-                        {{if ne $k "azure"}}
+                        {{if ne $k "0"}}
                         <li><a class="js-modal-open" href="" data-target="c-{{$k}}">{{$c.Name}}({{$c.SimpleName}})</a></li>
                         {{end}}
                         {{end}}
@@ -18,10 +19,25 @@
                     <p>団体名やイベント名をクリックすることで詳細情報を閲覧できます。</p>
                     <p>掲載頂ける団体や、単発イベントなどございましたら、運営のどらまでご連絡ください。</p>
                     <p>連絡先については、以下<a href="/about#contact">本サイトについて→お問い合わせ</a>をご確認ください。</p>
-                    <button class="button" onclick="location.href='/about'">本サイトについて</button>
+                    <button class="button azure" onclick="location.href='/about'">本サイトについて</button>
+                    <button class="button purple" onclick="location.href='https://github.com/pgDora56/Azure'">GitHub</button>
                 </article>
 
                 <p class="sub">Last Update: {{.update}}</p>
+
+                <article class="card">
+                <p>団体ごとの表示/非表示を切り替えられます。</p>
+                {{range $k, $c := .circles}}
+                <input type="checkbox" name="visibility" class="c-checkbox" value="{{$k}}" id="{{$k}}" checked>
+                <label class="label" for="{{$k}}">
+                {{if eq $c.SimpleName ""}}
+                単発
+                {{else}}
+                {{$c.SimpleName}}
+                {{end}}
+                </label>
+                {{end}}
+                </article>
 
                 <article class="card">
                     <table>
@@ -34,7 +50,7 @@
                         </tr>
                         {{end}}
 
-                        <tr>
+                        <tr class="sche-{{.Schedule.CircleId}}">
                             {{if ne .Schedule.Start.Time ""}}
                             <td>{{.Schedule.Start.Time}} ~ {{.Schedule.End.Time}}</td>
                             {{else}}
@@ -62,7 +78,7 @@
 
         <!-- Circle Modal -->
         {{range $k, $c := .circles}}
-        {{if ne $k "azure"}}
+        {{if ne $k "0"}}
         <div id="c-{{$k}}" class="modal js-modal">
             <div class="modal__bg js-modal-close"></div>
             <div class="modal__content">
@@ -72,6 +88,11 @@
                 {{end}}
                 <table>
                     {{range $c.Detail}}
+                    {{if eq .Item "Warning"}}
+                    <tr>
+                        <th colspan="2" class="warning">{{.Value}}</th>
+                    </tr>
+                    {{else}}
                     <tr>
                         <th class="sub">{{.Item}}</th>
                         <td>
@@ -88,6 +109,7 @@
                             {{end}}
                         </td>
                     </tr>
+                    {{end}}
                     {{end}}
                 </table>
                 <div class="wrap-button">
@@ -128,22 +150,7 @@
 
         <footer>Copyright &copy 2021 <b>Dora F.</b> All Rights Reserved.</footer>
 
-    <script>
-$(function(){
-    $('.js-modal-open').each(function(){
-        $(this).on('click',function(){
-            var target = $(this).data('target');
-            var modal = document.getElementById(target);
-            $(modal).fadeIn();
-            return false;
-        });
-    });
-    $('.js-modal-close').on('click',function(){
-        $('.js-modal').fadeOut();
-        return false;
-    }); 
-});
-    </script>
+    <script src="/resource/js/main.js"></script>
     </body>
 </html>
 

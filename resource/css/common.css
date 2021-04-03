@@ -14,14 +14,24 @@ a:hover {
     color: skyblue;
 }
 
+p {
+    margin-bottom: 1rem;
+}
+
 header a{
     color: black
 }
 
-button {
-    background-color: darkblue !important;
-    border: 0.1rem solid darkblue !important;
-    color: white !important;
+button.azure{
+    background-color: darkblue;
+    border: 0.1rem solid darkblue;
+    color: white;
+}
+
+button.purple {
+    background-color: indigo;
+    border: 0.1rem solid indigo;
+    color: white;
 }
 
 #main {
@@ -60,6 +70,11 @@ th.fit, td.fit {
     background-color: gray;
 }
 
+.warning {
+    color: red;
+    background-color: yellow;
+}
+
 table.event-detail tr,
 table.event-detail td {
     width: 100%;
@@ -72,6 +87,25 @@ table.event-detail td {
 footer {
     text-align:center;
     margin: 20px auto;
+}
+
+/* Checkbox to Button*/
+label.label{
+    cursor: pointer;
+    padding:5px;
+    border: 1px solid #434343;
+    border-radius: 5px;
+    display: inline;
+    margin:1px;
+    font-weight: 500;
+}
+input.c-checkbox{
+    display: none;
+}
+.c-checkbox:checked + .label {
+    color:white;
+    background-color: darkblue;
+    border: 1px solid darkblue;
 }
 
 /* Modal CSS */

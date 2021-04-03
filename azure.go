@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -37,11 +38,16 @@ func main() {
 
 	router.GET("/", func(ctx *gin.Context) {
 		cfg := cal.GetScheduleJson()
+		display := ctx.Query("display")
+		all := len(display) == 0
+
 		ctx.HTML(http.StatusOK, "main.tmpl", gin.H{
 			"title":   "Top",
 			"update":  cfg.Update,
 			"sche":    getTemplateSche(cfg.Schedules),
 			"circles": getCircles(),
+			"display": strings.Split(display, ","),
+			"isAll":   all,
 		})
 	})
 
