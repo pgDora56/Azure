@@ -92,7 +92,7 @@ footer {
 /* Checkbox to Button*/
 label.label{
     cursor: pointer;
-    padding:5px;
+    padding:10px;
     border: 1px solid #434343;
     border-radius: 5px;
     display: inline;

@@ -121,7 +121,7 @@ func getCircleFromJSON() (servers map[string]Circle) {
 	return
 }
 
-func GetEvents() []IntroEvent {
+func GetEvents() ([]IntroEvent, error) {
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
@@ -136,7 +136,8 @@ func GetEvents() []IntroEvent {
 
 	srv, err := calendar.New(client)
 	if err != nil {
-		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+		log.Printf("Unable to retrieve Calendar client: %v", err)
+		return nil, err
 	}
 
 	now := time.Now()
@@ -167,7 +168,7 @@ func GetEvents() []IntroEvent {
 	}
 
 	sort.Slice(introEvents, func(i, j int) bool { return compareEvent(introEvents[i].Event.Start, introEvents[j].Event.Start) })
-	return introEvents
+	return introEvents, nil
 	// for _, ieve := range introEvents {
 	// 	eve := ieve.Event
 	// 	date := eve.Start.DateTime
@@ -190,8 +191,11 @@ func GetScheduleJson() ScheduleConfig {
 	return cfg
 }
 
-func MakeScheduleJson() {
-	introEvents := GetEvents()
+func MakeScheduleJson() error {
+	introEvents, err := GetEvents()
+	if err != nil {
+		return err
+	}
 	schedules := map[string]IntroSchedule{}
 	var prev string
 	for idx, eve := range introEvents {
@@ -199,14 +203,16 @@ func MakeScheduleJson() {
 		if eve.Event.Start.Date == "" {
 			start, err := time.Parse(time.RFC3339, eve.Event.Start.DateTime)
 			if err != nil {
-				log.Fatalf("Start time can't parse!: %v\n", err)
+				log.Printf("Start time can't parse!: %v\n", err)
+				return err
 			}
 			sdate = start.Format("2006/01/02(Mon)")
 			stime = start.Format("15:04")
 		} else {
 			tmpsdate, err := time.Parse("2006-01-02", eve.Event.Start.Date)
 			if err != nil {
-				log.Fatalf("Start date can't parse!: %v\n", err)
+				log.Printf("Start date can't parse!: %v\n", err)
+				return err
 			}
 			sdate = tmpsdate.Format("2006/01/02(Mon)")
 		}
@@ -214,7 +220,8 @@ func MakeScheduleJson() {
 		if eve.Event.End.Date == "" {
 			end, err := time.Parse(time.RFC3339, eve.Event.End.DateTime)
 			if err != nil {
-				log.Fatalf("End time can't parse!: %v\n", err)
+				log.Printf("End time can't parse!: %v\n", err)
+				return err
 			}
 			etime = end.Format("15:04")
 		}
@@ -236,9 +243,11 @@ func MakeScheduleJson() {
 
 	js, err := json.MarshalIndent(ScheduleConfig{Update: time.Now().Format("2006-01-02 15:04:05"), Schedules: schedules}, "", "    ")
 	if err != nil {
-		log.Fatalf("Json marshal error: %v\n", err)
+		log.Printf("Json marshal error: %v\n", err)
+		return err
 	}
 	ioutil.WriteFile("schedule.json", js, 0644)
+	return nil
 }
 
 func compareEvent(dt1, dt2 *calendar.EventDateTime) bool {

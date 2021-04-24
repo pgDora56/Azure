@@ -17,8 +17,7 @@ import (
 func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--get" {
-			cal.MakeScheduleJson()
-			log.Println("Complete to get events from Google Calendar.")
+			callSchedule()
 			return
 		}
 	}
@@ -59,10 +58,17 @@ func main() {
 
 func loopGet() {
 	for {
-		cal.MakeScheduleJson()
-		log.Println("Complete to get events from Google Calendar.")
-
+		callSchedule()
 		time.Sleep(time.Minute * 5)
+	}
+}
+
+func callSchedule() {
+	err := cal.MakeScheduleJson()
+	if err == nil {
+		log.Println("Complete to get events from Google Calendar.")
+	} else {
+		log.Println("Fail to get events from Google Calendar.")
 	}
 }
 
@@ -70,6 +76,7 @@ type TmpSchedule struct {
 	Schedule   cal.IntroSchedule
 	Simple     string
 	CircleName string
+	Closed     bool
 }
 
 func getCircles() map[string]cal.Circle {
@@ -83,6 +90,7 @@ func getCircles() map[string]cal.Circle {
 	if err != nil {
 		log.Fatalf("Unmarshal error circles.json: %v\n", err)
 	}
+
 	return circles
 }
 
@@ -93,16 +101,9 @@ func getTemplateSche(sche map[string]cal.IntroSchedule) (sc []TmpSchedule) {
 			Schedule:   s,
 			Simple:     cir[s.CircleId].SimpleName,
 			CircleName: cir[s.CircleId].Name,
+			Closed:     len(cir[s.CircleId].Overview) == 0,
 		})
 	}
 	sort.Slice(sc, func(i, j int) bool { return sc[i].Schedule.No < sc[j].Schedule.No })
 	return sc
 }
-
-// func getCircleList() (clist []string) {
-// 	circles := getCircles()
-// 	for _, c := range circles {
-// 		clist = append(clist, c.Name)
-// 	}
-// 	return
-// }

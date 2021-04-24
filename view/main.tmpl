@@ -8,11 +8,13 @@
                     <h3>試験運用中</h3>
                     <p>現在試験運用中です。直近3ヶ月までの予定が記載されます。</p>
                     <p>当サイトの利用によって生じた不利益について、サイト側は一切の責任を負いません。自己責任でご利用ください。</p>
-                    <p>現在登録されている団体は以下の通りです。</p>
+                    <p>現在登録されている団体は以下の通りです（以下に掲載がない団体は予定のみの掲載です）。</p>
                     <ul>
                         {{range $k, $c := .circles}}
                         {{if ne $k "0"}}
+                        {{if ne (len $c.Overview) 0}}
                         <li><a class="js-modal-open" href="" data-target="c-{{$k}}">{{$c.Name}}({{$c.SimpleName}})</a></li>
+                        {{end}}
                         {{end}}
                         {{end}}
                     </ul>
@@ -58,9 +60,13 @@
                             {{end}}
                             <td class="fit">
                                 {{if ne .Simple ""}}
+                                {{if .Closed}}
+                                {{.Simple}}
+                                {{else}}
                                 <a class="js-modal-open" href="" data-target="c-{{.Schedule.CircleId}}">
                                     {{.Simple}}
                                 </a>
+                                {{end}}
                                 {{end}}
                             </td>
                             <td>
@@ -78,6 +84,7 @@
 
         <!-- Circle Modal -->
         {{range $k, $c := .circles}}
+        {{if ne (len $c.Overview) 0}}
         {{if ne $k "0"}}
         <div id="c-{{$k}}" class="modal js-modal">
             <div class="modal__bg js-modal-close"></div>
@@ -117,6 +124,7 @@
                 </div>
             </div><!--modal__inner-->
         </div><!--modal-->
+        {{end}}
         {{end}}
         {{end}}
 
