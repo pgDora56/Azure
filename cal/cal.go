@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"golang.org/x/net/context"
@@ -43,6 +44,7 @@ type IntroSchedule struct {
 	Description string   `json:"description"`
 	Start       DateData `json:"start"`
 	End         DateData `json:"end"`
+	IsOffline	bool `json:"offline"`
 }
 
 type DateData struct {
@@ -230,14 +232,24 @@ func MakeScheduleJson() error {
 		} else {
 			prev = sdate
 		}
+		title := ""
+		isOff := false
+		if eve.Event.Summary[0:1] == "#"{
+			// Hold offline
+			isOff = true
+			title = strings.TrimSpace(eve.Event.Summary[1:])
+		} else {
+			title = eve.Event.Summary
+		}
 		schedules[eve.Event.Id] = IntroSchedule{
 			No:          idx + 1,
 			CircleId:    eve.CircleId,
 			EventId:     eve.Event.Id,
-			Title:       eve.Event.Summary,
+			Title:      title, 
 			Description: eve.Event.Description,
 			Start:       DateData{Date: sdate, Time: stime},
 			End:         DateData{Date: edate, Time: etime},
+			IsOffline: 	 isOff,
 		}
 	}
 

@@ -132,6 +132,12 @@ input.c-checkbox{
     width: 60%;
 }
 
+/* High Priority */
+.offline {
+    background-color: lemonchiffon;
+}
+
+
 
 /* For tablet or smartphone */
 @media screen and (max-width: 767px) {

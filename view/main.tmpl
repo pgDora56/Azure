@@ -52,7 +52,7 @@
                         </tr>
                         {{end}}
 
-                        <tr class="sche-{{.Schedule.CircleId}}">
+                        <tr class="sche-{{.Schedule.CircleId}}{{if .Schedule.IsOffline}} offline{{end}}">
                             {{if ne .Schedule.Start.Time ""}}
                             <td>{{.Schedule.Start.Time}} ~ {{.Schedule.End.Time}}</td>
                             {{else}}
@@ -136,7 +136,7 @@
         {{end}}
         <div id="e-{{.Schedule.EventId}}" class="modal js-modal">
             <div class="modal__bg js-modal-close"></div>
-            <div class="modal__content">
+            <div class="modal__content{{if .Schedule.IsOffline}} offline{{end}}">
                 <h4>{{.Schedule.Title}}</h4>
                 <table class="event-detail">
                     <tr><td>{{$date}} {{.Schedule.Start.Time}} ~ {{.Schedule.End.Time}}</td></tr>
