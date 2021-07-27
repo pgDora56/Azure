@@ -107,3 +107,11 @@ func getTemplateSche(sche map[string]cal.IntroSchedule) (sc []TmpSchedule) {
 	sort.Slice(sc, func(i, j int) bool { return sc[i].Schedule.No < sc[j].Schedule.No })
 	return sc
 }
+
+// func getCircleList() (clist []string) {
+// 	circles := getCircles()
+// 	for _, c := range circles {
+// 		clist = append(clist, c.Name)
+// 	}
+// 	return
+// }
