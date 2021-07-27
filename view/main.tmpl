@@ -28,7 +28,7 @@
                 <p class="sub">Last Update: {{.update}}</p>
 
                 <article class="card">
-                <p>団体ごとの表示/非表示を切り替えられます。</p>
+                <p>団体ごとの表示/非表示を切り替えられます。背景が黄色のイベントはオフラインでの開催予定のイベントになります。</p>
                 {{range $k, $c := .circles}}
                 <input type="checkbox" name="visibility" class="c-checkbox" value="{{$k}}" id="{{$k}}" checked>
                 <label class="label" for="{{$k}}">
