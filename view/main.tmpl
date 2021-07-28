@@ -22,6 +22,7 @@
                     <p>掲載頂ける団体や、単発イベントなどございましたら、運営のどらまでご連絡ください。</p>
                     <p>連絡先については、以下<a href="/about#contact">本サイトについて→お問い合わせ</a>をご確認ください。</p>
                     <button class="button azure" onclick="location.href='/about'">本サイトについて</button>
+                    <button class="button azure" onclick="location.href='https://pgdora56.hateblo.jp/archive/category/Azure%20Update'">更新情報(Blog)</button>
                     <button class="button purple" onclick="location.href='https://github.com/pgDora56/Azure'">GitHub</button>
                 </article>
 
@@ -146,7 +147,7 @@
                     {{if eq .Schedule.Description ""}}
                     <tr><td>詳細情報はありません。</td></tr>
                     {{else}}
-                    <tr><td>{{.Schedule.Description}}</td></tr>
+                    <tr><td>{{.Schedule.Description | safe}}</td></tr>
                     {{end}}
                 </table>
                 <div class="wrap-button">

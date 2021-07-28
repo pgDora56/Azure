@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -29,6 +30,9 @@ func main() {
 	// routerの初期設定
 	router := gin.Default()
 
+	router.SetFuncMap(template.FuncMap{
+		"safe": noescape,
+	})
 	// js,css,faviconなどを読み込むためのasstes設定
 	router.LoadHTMLGlob("view/*.tmpl")
 	router.Static("/resource", "./resource")
@@ -54,6 +58,10 @@ func main() {
 	router.Run(":52417")
 
 	log.Println("End Introquiz Portal Square Azure")
+}
+
+func noescape(tmpl string) template.HTML {
+	return template.HTML(tmpl)
 }
 
 func loopGet() {

@@ -3,10 +3,12 @@ package cal
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -44,7 +46,7 @@ type IntroSchedule struct {
 	Description string   `json:"description"`
 	Start       DateData `json:"start"`
 	End         DateData `json:"end"`
-	IsOffline	bool `json:"offline"`
+	IsOffline   bool     `json:"offline"`
 }
 
 type DateData struct {
@@ -234,22 +236,30 @@ func MakeScheduleJson() error {
 		}
 		title := ""
 		isOff := false
-		if eve.Event.Summary[0:1] == "#"{
+		if eve.Event.Summary[0:1] == "#" {
 			// Hold offline
 			isOff = true
 			title = strings.TrimSpace(eve.Event.Summary[1:])
 		} else {
 			title = eve.Event.Summary
 		}
+
+		description := html.EscapeString(eve.Event.Description)
+		r := regexp.MustCompile(`https?://[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+`)
+		fs := r.FindAllString(description, -1)
+		for i := 0; i < len(fs); i++ {
+			url := fs[i]
+			description = strings.Replace(description, url, "<a href='"+url+"'>"+url+"</a>", -1)
+		}
 		schedules[eve.Event.Id] = IntroSchedule{
 			No:          idx + 1,
 			CircleId:    eve.CircleId,
 			EventId:     eve.Event.Id,
-			Title:      title, 
-			Description: eve.Event.Description,
+			Title:       title,
+			Description: description,
 			Start:       DateData{Date: sdate, Time: stime},
 			End:         DateData{Date: edate, Time: etime},
-			IsOffline: 	 isOff,
+			IsOffline:   isOff,
 		}
 	}
 
