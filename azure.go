@@ -39,13 +39,15 @@ func main() {
 	router.StaticFile("/favicon.ico", "./resource/favicon.ico")
 
 	router.GET("/", func(ctx *gin.Context) {
-		cfg := cal.GetScheduleJson()
+		sche := cal.GetScheduleJson()
+		cfg := getConfig()
 
 		ctx.HTML(http.StatusOK, "main.tmpl", gin.H{
 			"title":   "Top",
-			"update":  cfg.Update,
-			"sche":    getTemplateSche(cfg.Schedules),
+			"update":  sche.Update,
+			"sche":    getTemplateSche(sche.Schedules),
 			"circles": getCircles(),
+			"message": cfg.Msg,
 		})
 	})
 
@@ -116,10 +118,27 @@ func getTemplateSche(sche map[string]cal.IntroSchedule) (sc []TmpSchedule) {
 	return sc
 }
 
-// func getCircleList() (clist []string) {
-// 	circles := getCircles()
-// 	for _, c := range circles {
-// 		clist = append(clist, c.Name)
-// 	}
-// 	return
-// }
+type Config struct {
+	Msg Message `json:"message"`
+}
+
+type Message struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
+func getConfig() (cfg Config) {
+	js, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		log.Fatalf("Can't read config.json: %v\n", err)
+	}
+
+	err = json.Unmarshal(js, &cfg)
+	if err != nil {
+		log.Fatalf("Unmarshal error config.json: %v\n", err)
+	}
+
+	log.Println("##########", cfg, cfg.Msg.Title, cfg.Msg.Content)
+
+	return cfg
+}

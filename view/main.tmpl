@@ -4,6 +4,12 @@
         <div id="page">
             {{template "body-header"}}
             <section id="main">
+                {{if ne .message.Title ""}}
+                <article class="card">
+                    <h3>{{.message.Title}}</h3>
+                    <p>{{.message.Content | safe}}</p>
+                </article>
+                {{end}}
                 <article class="card">
                     <p>直近3ヶ月までの予定が記載されます。</p>
                     <p>当サイトの利用によって生じた不利益について、サイト側は一切の責任を負いません。自己責任でご利用ください。</p>
