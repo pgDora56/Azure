@@ -244,8 +244,10 @@ func MakeScheduleJson() error {
 			title = eve.Event.Summary
 		}
 
-		description := html.EscapeString(eve.Event.Description)
-		r := regexp.MustCompile(`https?://[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+`)
+		r := regexp.MustCompile(`</??[\w]+>`)
+		description := r.ReplaceAllString(eve.Event.Description, "")
+		description = html.EscapeString(description)
+		r = regexp.MustCompile(`https?://[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+`)
 		fs := r.FindAllString(description, -1)
 		for i := 0; i < len(fs); i++ {
 			url := fs[i]

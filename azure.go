@@ -138,7 +138,5 @@ func getConfig() (cfg Config) {
 		log.Fatalf("Unmarshal error config.json: %v\n", err)
 	}
 
-	log.Println("##########", cfg, cfg.Msg.Title, cfg.Msg.Content)
-
 	return cfg
 }
