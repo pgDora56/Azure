@@ -35,20 +35,23 @@
                 <p class="sub">Last Update: {{.update}}</p>
 
                 <article class="card">
-                <p>団体ごとの表示/非表示を切り替えられます。背景が黄色のイベントはオフラインでの開催予定のイベントになります。</p>
-                {{range $k, $c := .circles}}
-                <input type="checkbox" name="visibility" class="c-checkbox" value="{{$k}}" id="{{$k}}" checked>
-                <label class="label" for="{{$k}}">
-                {{if eq $c.SimpleName ""}}
-                単発
-                {{else}}
-                {{$c.SimpleName}}
-                {{end}}
-                </label>
-                {{end}}
+                <p>団体ごとの表示/非表示を切り替えられます。すべて表示されていない場合は左右にスライドしてください．</p>
+                <div id="circle-check">
+                    {{range $k, $c := .circles}}
+                    <input type="checkbox" name="visibility" class="c-checkbox" value="{{$k}}" id="{{$k}}" checked>
+                    <label class="label" for="{{$k}}">
+                    {{if eq $c.SimpleName ""}}
+                    単発
+                    {{else}}
+                    {{$c.SimpleName}}
+                    {{end}}
+                    </label>
+                    {{end}}
+                </div>
                 </article>
 
                 <article class="card">
+                    背景が黄色のイベントはオフラインでの開催予定のイベントになります。
                     <table>
                         {{range .sche}}
                         {{if ne .Schedule.Start.Date ""}}

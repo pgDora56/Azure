@@ -98,6 +98,7 @@ label.label{
     display: inline;
     margin:1px;
     font-weight: 500;
+    white-space: nowrap;
 }
 input.c-checkbox{
     display: none;
@@ -106,6 +107,12 @@ input.c-checkbox{
     color:white;
     background-color: darkblue;
     border: 1px solid darkblue;
+}
+#circle-check {
+    display: flex;
+    overflow-x: scroll;
+    margin: 0;
+    padding: 0;
 }
 
 /* Modal CSS */
