@@ -25,7 +25,8 @@ func main() {
 
 	log.Println("Start Introquiz Portal Square Azure")
 
-	go loopGet()
+	cfg := getConfig()
+	go loopGet(cfg.CheckDistance)
 
 	// routerの初期設定
 	router := gin.Default()
@@ -66,10 +67,10 @@ func noescape(tmpl string) template.HTML {
 	return template.HTML(tmpl)
 }
 
-func loopGet() {
+func loopGet(distance int) {
 	for {
 		callSchedule()
-		time.Sleep(time.Minute * 5)
+		time.Sleep(time.Minute * time.Duration(distance))
 	}
 }
 
@@ -119,7 +120,8 @@ func getTemplateSche(sche map[string]cal.IntroSchedule) (sc []TmpSchedule) {
 }
 
 type Config struct {
-	Msg Message `json:"message"`
+	CheckDistance int     `json:"check_distance"`
+	Msg           Message `json:"message"`
 }
 
 type Message struct {

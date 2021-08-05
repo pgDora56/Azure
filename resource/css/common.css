@@ -2,6 +2,13 @@
     margin: 20px 30px;
 }
 
+body.fixed {
+    position: fixed;
+	width: 100%;
+	height: 100%;
+	left: 0;
+}
+
 section{
     padding-top: 41.7px;
 }
@@ -137,6 +144,8 @@ input.c-checkbox{
     top: 50%;
     transform: translate(-50%,-50%);
     width: 60%;
+    max-height: 90%;
+    overflow-y:scroll;
 }
 
 /* High Priority */
