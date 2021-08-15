@@ -158,7 +158,7 @@ func GetEvents() ([]IntroEvent, error) {
 		events, err := srv.Events.List(url).ShowDeleted(false).
 			SingleEvents(true).TimeMin(t).TimeMax(m3).OrderBy("startTime").Do()
 		if err != nil {
-			log.Fatalf("Unable to retrieve next ten of the user's events: %v\n", err)
+			log.Printf("Unable to retrieve next ten of the user's events: %v\n", err)
 		}
 		for _, item := range events.Items {
 			// evelist = append(evelist, item)
