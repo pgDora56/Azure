@@ -12,7 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"./cal"
+	"cal"
 )
 
 func main() {
