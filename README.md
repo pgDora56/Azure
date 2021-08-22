@@ -47,3 +47,49 @@
 }
 ```
 
+
+## Schedule data structure update
+* `No`はいらなさそう
+    * `Circle`と`ID`をUniqueキーとして扱う
+    * RDBで日付と時間でソートさせれば良い
+* `date`を独立させる
+    * `end.date` が仕事してなかった
+* `updated` の追加
+    * calenderAPIでUpdatedTimeを取得できるので，そこから取得．
+        * カレンダー情報を取得した上で，この時間が(5分＋マージン数秒)以内のものだけ更新処理をさせるようにする
+    * これを活用してNew update viewを作る
+
+### 旧データ
+```
+"22ollf8qk3r8ldsrlol8f59iia": {
+    "no": 9,
+    "circle": "ikm",
+    "id": "22ollf8qk3r8ldsrlol8f59iia",
+    "title": "企画名",
+    "description": "説明",
+    "start": {
+        "date": "",
+        "time": "22:00"
+    },
+    "end": {
+        "date": "",
+        "time": "01:00"
+    },
+    "offline": false
+},
+```
+
+### 新データ(これをDBにする)
+```
+"22ollf8qk3r8ldsrlol8f59iia": {
+    "circle": "ikm",
+    "id": "22ollf8qk3r8ldsrlol8f59iia",
+    "title": "企画名",
+    "description": "説明",
+    "date": "2021/08/28(Sat)",
+    "start": "22:00",
+    "end": "01:00",
+    "offline": false,
+    "updated": "2021/08/23 11:00:23(形式は適宜)"
+},
+```
