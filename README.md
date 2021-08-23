@@ -54,10 +54,12 @@
     * RDBで日付と時間でソートさせれば良い
 * `date`を独立させる
     * `end.date` が仕事してなかった
-* `updated` の追加
-    * calenderAPIでUpdatedTimeを取得できるので，そこから取得．
+* `created`, `updated` の追加
+    * calenderAPIでCreatedTimeとUpdatedTimeを取得できるので，そこから取得．
         * カレンダー情報を取得した上で，この時間が(5分＋マージン数秒)以内のものだけ更新処理をさせるようにする
     * これを活用してNew update viewを作る
+* `deleted` の追加
+    * 削除されたデータもすべて取得するように変更．calenderAPIのStatusで `cancelled` となっているかどうかで削除されたものであるかが確認できるため，これを活用して削除されたかを確認．開催日を超えたら通常のイベント同様にデータ自体を削除．
 
 ### 旧データ
 ```
@@ -79,7 +81,7 @@
 },
 ```
 
-### 新データ(これをDBにする)
+### 新データ
 ```
 "22ollf8qk3r8ldsrlol8f59iia": {
     "circle": "ikm",
@@ -90,6 +92,8 @@
     "start": "22:00",
     "end": "01:00",
     "offline": false,
-    "updated": "2021/08/23 11:00:23(形式は適宜)"
+    "created": "2021/08/12 21:12:32",
+    "updated": "2021/08/23 11:00:23(形式は適宜)",
+    "deleted": false
 },
 ```

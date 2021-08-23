@@ -47,6 +47,7 @@ type IntroSchedule struct {
 	Start       DateData `json:"start"`
 	End         DateData `json:"end"`
 	IsOffline   bool     `json:"offline"`
+	Status      string   `json:"status"`
 }
 
 type DateData struct {
@@ -155,7 +156,7 @@ func GetEvents() ([]IntroEvent, error) {
 	// var evelist [](*calendar.Event)
 	for key, server := range servers {
 		url := server.CalendarURL
-		events, err := srv.Events.List(url).ShowDeleted(false).
+		events, err := srv.Events.List(url).ShowDeleted(true).
 			SingleEvents(true).TimeMin(t).TimeMax(m3).OrderBy("startTime").Do()
 		if err != nil {
 			log.Printf("Unable to retrieve next ten of the user's events: %v\n", err)
@@ -193,6 +194,10 @@ func GetScheduleJson() ScheduleConfig {
 		log.Fatalf("Unmarshal error when parse schedule.json: %v\n", err)
 	}
 	return cfg
+}
+
+func UpdateDatabase() error {
+
 }
 
 func MakeScheduleJson() error {
@@ -263,6 +268,7 @@ func MakeScheduleJson() error {
 			Start:       DateData{Date: sdate, Time: stime},
 			End:         DateData{Date: edate, Time: etime},
 			IsOffline:   isOff,
+			Status:      eve.Event.Status,
 		}
 	}
 

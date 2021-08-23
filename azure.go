@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"azuredb"
 	"cal"
 )
 
@@ -20,7 +22,14 @@ func main() {
 		if os.Args[1] == "--get" {
 			callSchedule()
 			return
+		} else if os.Args[1] == "--db-init-test" {
+			db := azuredb.DbInitialize()
+			log.Println(db)
+			return
 		}
+		fmt.Println("Invalid option:", os.Args[1])
+		fmt.Println("Program exited.")
+		return
 	}
 
 	log.Println("Start Introquiz Portal Square Azure")
