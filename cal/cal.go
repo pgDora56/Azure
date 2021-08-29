@@ -236,12 +236,16 @@ func MakeScheduleJson() error {
 		}
 		title := ""
 		isOff := false
-		if eve.Event.Summary[0:1] == "#" {
-			// Hold offline
-			isOff = true
-			title = strings.TrimSpace(eve.Event.Summary[1:])
-		} else {
+		if len(eve.Event.Summary) == 0 {
 			title = eve.Event.Summary
+		} else {
+			if eve.Event.Summary[0:1] == "#" {
+				// Hold offline
+				isOff = true
+				title = strings.TrimSpace(eve.Event.Summary[1:])
+			} else {
+				title = eve.Event.Summary
+			}
 		}
 
 		r := regexp.MustCompile(`</??[\w]+>`)
