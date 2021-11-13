@@ -2,6 +2,7 @@
 Description = Azure
 
 [Service]
+EnvironmentFile=/etc/sysconfig/azure_env
 ExecStart = sh /server/azure/wakeup.sh
 Restart = always
 Type = simple
