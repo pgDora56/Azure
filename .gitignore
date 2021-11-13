@@ -1,3 +1,4 @@
 *.json
 nohup.out
 azure
+*.log

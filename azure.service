@@ -1,0 +1,11 @@
+[Unit]
+Description = Azure
+
+[Service]
+ExecStart = sh /server/azure/wakeup.sh
+Restart = always
+Type = simple
+
+[Install]
+WantedBy = multi-user.target
+
