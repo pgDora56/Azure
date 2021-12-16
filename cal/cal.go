@@ -13,6 +13,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pgDora56/Azure/dynamodb"
+	"github.com/pgDora56/Azure/schemas"
+
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -38,25 +41,9 @@ type IntroEvent struct {
 	Event    *calendar.Event
 }
 
-type IntroSchedule struct {
-	No          int      `json:"no"`
-	CircleId    string   `json:"circle"`
-	EventId     string   `json:"id"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Start       DateData `json:"start"`
-	End         DateData `json:"end"`
-	IsOffline   bool     `json:"offline"`
-}
-
-type DateData struct {
-	Date string `json:"date"`
-	Time string `json:"time"`
-}
-
 type ScheduleConfig struct {
-	Update    string                   `json:"update"`
-	Schedules map[string]IntroSchedule `json:"schedules"`
+	Update    string                           `json:"update"`
+	Schedules map[string]schemas.IntroSchedule `json:"schedules"`
 }
 
 // Retrieve a token, saves the token, then returns the generated client.
@@ -125,7 +112,7 @@ func getCircleFromJSON() (servers map[string]Circle) {
 	return
 }
 
-func GetEvents() ([]IntroEvent, error) {
+func GetEventsFromGC() ([]IntroEvent, error) {
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
@@ -161,26 +148,12 @@ func GetEvents() ([]IntroEvent, error) {
 			log.Printf("Unable to retrieve next ten of the user's events: %v\n", err)
 		}
 		for _, item := range events.Items {
-			// evelist = append(evelist, item)
 			introEvents = append(introEvents, IntroEvent{key, item})
-			// date := item.Start.DateTime
-			// if date == "" {
-			// 	date = item.Start.Date
-			// }
-			// fmt.Printf("%v (%v)\n", item.Summary, date)
 		}
 	}
 
 	sort.Slice(introEvents, func(i, j int) bool { return compareEvent(introEvents[i].Event.Start, introEvents[j].Event.Start) })
 	return introEvents, nil
-	// for _, ieve := range introEvents {
-	// 	eve := ieve.Event
-	// 	date := eve.Start.DateTime
-	// 	if date == "" {
-	// 		date = eve.Start.Date
-	// 	}
-	// 	fmt.Printf("%v - [%v]%v\n", date, ieve.Place, eve.Summary)
-	// }
 }
 
 func GetScheduleJson() ScheduleConfig {
@@ -195,12 +168,12 @@ func GetScheduleJson() ScheduleConfig {
 	return cfg
 }
 
-func MakeScheduleJson() error {
-	introEvents, err := GetEvents()
+func Insert2Dynamo(dynamoCfg schemas.DynamoConfig) error {
+	introEvents, err := GetEventsFromGC()
 	if err != nil {
 		return err
 	}
-	schedules := map[string]IntroSchedule{}
+	schedules := []schemas.IntroSchedule{}
 	var prev string
 	for idx, eve := range introEvents {
 		var stime, sdate, etime, edate string
@@ -258,24 +231,28 @@ func MakeScheduleJson() error {
 			url := fs[i]
 			description = strings.Replace(description, url, "<a href='"+url+"'>"+url+"</a>", -1)
 		}
-		schedules[eve.Event.Id] = IntroSchedule{
+		schedules = append(schedules, schemas.IntroSchedule{
 			No:          idx + 1,
 			CircleId:    eve.CircleId,
 			EventId:     eve.Event.Id,
 			Title:       title,
 			Description: description,
-			Start:       DateData{Date: sdate, Time: stime},
-			End:         DateData{Date: edate, Time: etime},
+			Start:       schemas.DateData{Date: sdate, Time: stime},
+			End:         schemas.DateData{Date: edate, Time: etime},
 			IsOffline:   isOff,
-		}
+		})
 	}
-
-	js, err := json.MarshalIndent(ScheduleConfig{Update: time.Now().Format("2006-01-02 15:04:05"), Schedules: schedules}, "", "    ")
+	err = dynamodb.Insert(dynamoCfg, schedules)
 	if err != nil {
-		log.Printf("Json marshal error: %v\n", err)
 		return err
 	}
-	ioutil.WriteFile("schedule.json", js, 0644)
+
+	// js, err := json.MarshalIndent(ScheduleConfig{Update: time.Now().Format("2006-01-02 15:04:05"), Schedules: schedules}, "", "    ")
+	// if err != nil {
+	// 	log.Printf("Json marshal error: %v\n", err)
+	// 	return err
+	// }
+	// ioutil.WriteFile("schedule.json", js, 0644)
 	return nil
 }
 

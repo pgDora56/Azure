@@ -12,21 +12,35 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"cal"
+	"github.com/pgDora56/Azure/cal"
+	"github.com/pgDora56/Azure/dynamodb"
+	"github.com/pgDora56/Azure/schemas"
 )
 
 func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--get" {
-			callSchedule()
+			cfg := getConfig()
+			callSchedule(cfg.Dynamo)
 			return
 		}
+		if os.Args[1] == "--show" {
+			cfg := getConfig()
+			data, err := dynamodb.Get(cfg.Dynamo)
+			log.Println(data)
+			if err != nil {
+				panic(err)
+			}
+			return
+		}
+		log.Println("Unknown arguments")
+		return
 	}
 
 	log.Println("Start Introquiz Portal Square Azure")
 
 	cfg := getConfig()
-	go loopGet(cfg.CheckDistance)
+	go loopGet(cfg.Dynamo, cfg.CheckDistance)
 
 	// routerの初期設定
 	router := gin.Default()
@@ -67,24 +81,25 @@ func noescape(tmpl string) template.HTML {
 	return template.HTML(tmpl)
 }
 
-func loopGet(distance int) {
+func loopGet(dcfg schemas.DynamoConfig, distance int) {
 	for {
-		callSchedule()
+		callSchedule(dcfg)
 		time.Sleep(time.Minute * time.Duration(distance))
 	}
 }
 
-func callSchedule() {
-	err := cal.MakeScheduleJson()
+func callSchedule(dcfg schemas.DynamoConfig) {
+	err := cal.Insert2Dynamo(dcfg)
 	if err == nil {
 		log.Println("Complete to get events from Google Calendar.")
 	} else {
 		log.Println("Fail to get events from Google Calendar.")
+		log.Println(err)
 	}
 }
 
 type TmpSchedule struct {
-	Schedule   cal.IntroSchedule
+	Schedule   schemas.IntroSchedule
 	Simple     string
 	CircleName string
 	Closed     bool
@@ -105,7 +120,7 @@ func getCircles() map[string]cal.Circle {
 	return circles
 }
 
-func getTemplateSche(sche map[string]cal.IntroSchedule) (sc []TmpSchedule) {
+func getTemplateSche(sche map[string]schemas.IntroSchedule) (sc []TmpSchedule) {
 	cir := getCircles()
 	for _, s := range sche {
 		sc = append(sc, TmpSchedule{
@@ -119,17 +134,7 @@ func getTemplateSche(sche map[string]cal.IntroSchedule) (sc []TmpSchedule) {
 	return sc
 }
 
-type Config struct {
-	CheckDistance int     `json:"check_distance"`
-	Msg           Message `json:"message"`
-}
-
-type Message struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
-
-func getConfig() (cfg Config) {
+func getConfig() (cfg schemas.Config) {
 	js, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		log.Fatalf("Can't read config.json: %v\n", err)

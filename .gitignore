@@ -1,2 +1,3 @@
 *.json
 nohup.out
+*.db
