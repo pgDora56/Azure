@@ -168,13 +168,17 @@ func GetScheduleJson() ScheduleConfig {
 	return cfg
 }
 
+func GetScheduleFromDynamo() []schemas.IntroSchedule {
+	return nil
+}
+
 func Insert2Dynamo(dynamoCfg schemas.DynamoConfig) error {
 	introEvents, err := GetEventsFromGC()
 	if err != nil {
 		return err
 	}
 	schedules := []schemas.IntroSchedule{}
-	var prev string
+	// var prev string
 	for idx, eve := range introEvents {
 		var stime, sdate, etime, edate string
 		if eve.Event.Start.Date == "" {
@@ -202,11 +206,15 @@ func Insert2Dynamo(dynamoCfg schemas.DynamoConfig) error {
 			}
 			etime = end.Format("15:04")
 		}
-		if prev == sdate {
-			sdate = ""
-		} else {
-			prev = sdate
-		}
+
+		// 一つ前のデータと同じであれば日付を削除
+		/*
+			if prev == sdate {
+				sdate = ""
+			} else {
+				prev = sdate
+			}
+		*/
 		title := ""
 		isOff := false
 		if len(eve.Event.Summary) == 0 {

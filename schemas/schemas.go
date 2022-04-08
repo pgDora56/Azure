@@ -20,6 +20,7 @@ type Config struct {
 	CheckDistance int          `json:"check_distance"`
 	Msg           Message      `json:"message"`
 	Dynamo        DynamoConfig `json:"dynamo"`
+	Update        string       `json:"update"`
 }
 
 type Message struct {

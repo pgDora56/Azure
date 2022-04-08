@@ -54,13 +54,17 @@ func main() {
 	router.StaticFile("/favicon.ico", "./resource/favicon.ico")
 
 	router.GET("/", func(ctx *gin.Context) {
-		sche := cal.GetScheduleJson()
+		// sche := cal.GetScheduleJson()
+		sc, err := dynamodb.Get(cfg.Dynamo)
+		if err != nil {
+			//  error shori
+		}
 		cfg := getConfig()
 
 		ctx.HTML(http.StatusOK, "main.tmpl", gin.H{
 			"title":   "Top",
-			"update":  sche.Update,
-			"sche":    getTemplateSche(sche.Schedules),
+			"update":  cfg.Update, // 更新時間
+			"sche":    parse2TmpSchedule(sc),
 			"circles": getCircles(),
 			"message": cfg.Msg,
 		})
@@ -131,6 +135,28 @@ func getTemplateSche(sche map[string]schemas.IntroSchedule) (sc []TmpSchedule) {
 		})
 	}
 	sort.Slice(sc, func(i, j int) bool { return sc[i].Schedule.No < sc[j].Schedule.No })
+	return sc
+}
+
+func parse2TmpSchedule(sche []schemas.IntroSchedule) (sc []TmpSchedule) {
+	cir := getCircles()
+	prev := ""
+	sort.Slice(sche, func(i, j int) bool { return sche[i].No < sche[j].No })
+	for _, s := range sche {
+		if prev == s.Start.Date {
+			s.Start.Date = ""
+		} else {
+			prev = s.Start.Date
+		}
+		log.Println(prev)
+		sc = append(sc, TmpSchedule{
+			Schedule:   s,
+			Simple:     cir[s.CircleId].SimpleName,
+			CircleName: cir[s.CircleId].Name,
+			Closed:     len(cir[s.CircleId].Overview) == 0,
+		})
+	}
+	// sort.Slice(sc, func(i, j int) bool { return sc[i].Schedule.No < sc[j].Schedule.No })
 	return sc
 }
 
