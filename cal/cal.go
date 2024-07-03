@@ -159,6 +159,7 @@ func GetEvents() ([]IntroEvent, error) {
 			SingleEvents(true).TimeMin(t).TimeMax(m3).OrderBy("startTime").Do()
 		if err != nil {
 			log.Printf("Unable to retrieve next ten of the user's events: %v\n", err)
+			return nil, err
 		}
 		for _, item := range events.Items {
 			// evelist = append(evelist, item)
