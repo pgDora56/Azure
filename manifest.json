@@ -1,0 +1,21 @@
+{
+    "name": "Introquiz Portal Square Azure",
+    "short_name": "Azure",
+    "description": "Support Your Introquiz Life",
+    "start_url": "/",
+    "scope": "/",
+    "theme_color": "darkblue",
+    "background_color": "pink",
+    "display": "standalone",
+    "orientation": "portrait",
+    "lang": "ja-jp",
+    "icons": [{
+        "src": "/resource/logo/azurelogo-192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }, {
+        "src": "/resource/logo/azurelogo-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    }]
+}

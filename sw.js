@@ -5,9 +5,9 @@ const NAME = 'azure-v1-';
 const VERSION = '001';
 const CACHE_NAME = NAME + VERSION;
 const urlsToCache = [
-  '/css/common.css',
-  '/js/main.js',
-  '/favicon.ico',
+  '/resource/css/common.css',
+  '/resource/js/main.js',
+  '/favicon.ico'
 ];
 
 // Service Worker へファイルをインストール
