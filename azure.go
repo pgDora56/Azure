@@ -58,6 +58,9 @@ func main() {
 		})
 	})
 
+	router.StaticFile("/sw.js", "./sw.js")
+	router.StaticFile("/manifest.json", "./manifest.json")
+
 	router.Run(":52417")
 
 	log.Println("End Introquiz Portal Square Azure")
