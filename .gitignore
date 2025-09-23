@@ -1,4 +1,6 @@
 *.json
+!manifest.json
 nohup.out
 azure
 *.log
+.DS_Store
